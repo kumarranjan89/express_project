@@ -1,0 +1,36 @@
+<% include ../partials/header %>
+<div class="layout_container">
+
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-6 col-sm-offset-3">
+			<div class="login">
+				<div class="form_caption">
+					<h3><%= title %></h3>
+				</div>
+				<% if(errors) { %>
+					<div class="alert alert-danger">
+						<% errors.forEach((error, index, errors) => { %>
+				         	<%= error.msg %><% if(index != errors.length-1) { %>, <% } %>
+						<% }) %>
+					</div>
+				<% } %>
+				<form action="/login" method="post">
+					<div class="form-group">
+						<label for="email">User name</label>
+						<input type="email" name="email" id="email" class="form-control" value="kumar.ranjan89@gmail.com">
+					</div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<input type="password" name="password" id="password" class="form-control" value="1234">
+					</div>
+					<p><a href="/register">Register</a> | <a href="/forget-password">Forget Password</a></p>
+					<input type="submit" value="Login" class="btn btn-success">
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<% include ../partials/footer %>
