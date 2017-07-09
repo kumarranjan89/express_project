@@ -77,7 +77,7 @@ const app = express();
  * Express configuration
  */
 app.set('port', process.env.PORT || 3000);
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); // set up ejs for templating
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressStatusMonitor());
 app.use(compression());
@@ -85,7 +85,8 @@ app.use(compression());
 	src: path.join(__dirname, './public/sass'),
 	src: path.join(__dirname, './public/css')
 }));*/
-app.use(logger('dev'));
+app.use(logger('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator({  //just after bodyParser
@@ -105,10 +106,13 @@ app.use(expressValidator({  //just after bodyParser
 	}
 }));
 
+/**
+ * required for passport
+ */
 app.use(session({ 
 	resave: true,
 	saveUninitialized: true,
-	secret: process.env.SESSION_SECRET,
+	secret: process.env.SESSION_SECRET, // session secret
 	store: new MongoStore({
 		url: process.env.MONGODB_URI,
 		autoReconnect: true,
@@ -116,8 +120,10 @@ app.use(session({
 	})
 }));
 app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+
 
 
 /**
@@ -149,6 +155,9 @@ app.route('/register')
 app.route('/forget-password')
 	.get(accountController.getForgetPassword)
 	.post(accountController.postForgetPassword);
+
+app.route('/logout')
+	.get(accountController.getLogout)
 
 /**
  * Api routes

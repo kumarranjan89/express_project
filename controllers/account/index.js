@@ -8,5 +8,6 @@
  	getRegister: require('./get-register'),
  	postRegister: require('./post-register'),
  	getForgetPassword: require('./get-forget-password'),
- 	postForgetPassword: require('./post-forget-password')
+ 	postForgetPassword: require('./post-forget-password'),
+ 	getLogout: require('./get-logout')
  }

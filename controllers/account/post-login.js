@@ -15,9 +15,11 @@ const passport = require('passport');
  	req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
  	
  	errors = req.validationErrors();
-
+	// const user = {
+	// 	email: req.body.email,
+	// 	password: req.body.password
+	// };
  	if(!errors) {
-
  		passport.authenticate('local', (err, user, info) => { 
  			console.log("Working");			
 		    if (err) { return next(err); }
@@ -45,3 +47,26 @@ const passport = require('passport');
 	 	}); 		
  	}
  }
+
+ /**
+ * Login Required middleware.
+ */
+exports.isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+};
+
+/**
+ * Authorization Required middleware.
+ */
+exports.isAuthorized = (req, res, next) => {
+  const provider = req.path.split('/').slice(-1)[0];
+  const token = req.user.tokens.find(token => token.kind === provider);
+  if (token) {
+    next();
+  } else {
+    res.redirect(`/auth/${provider}`);
+  }
+};
