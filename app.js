@@ -21,6 +21,8 @@ const ejs = require('ejs');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const passport = require('passport');
+const fs = require('fs');
+const rfs = require('rotating-file-stream');
 
 /**
  * Load Environment variables from .env file, where API keys and passwords are configured
@@ -86,13 +88,29 @@ app.use(compression());
 	src: path.join(__dirname, './public/css')
 }));*/
 app.use(logger('dev')); // log every request to the console
+
+//log on file
+var logDirectory = path.join(__dirname, 'log');
+
+//ensure log direcotry exists
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory); 
+
+//create a rotating write stream
+var accessLogStream = rfs('access.log', {
+	interval: '1d', //rotate daily
+	path: logDirectory
+});
+
+//setup the logger
+app.use(logger('default', {stream: accessLogStream})); //write to file in combined format
+
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator({  //just after bodyParser
-	errorFormatter: function(param, msg, value) { //[optional], this option can be used to specify a function that must build error objects used in the validation result returned by req.getValidationResult(). 
+	errorFormatter: function(param, msg, value) { //[optional], this option can be used to specify a function that must build error objects used in the validation result returned by req.getValidationResult(). 		 
 		var namespace = param.split('.'),
-			root = namespace.shift(),
+		 	root = namespace.shift(),
 			formParam = root;
 
 		while(namespace.length) {
@@ -157,7 +175,7 @@ app.route('/forget-password')
 	.post(accountController.postForgetPassword);
 
 app.route('/logout')
-	.get(accountController.getLogout)
+	.get(accountController.getLogout);
 
 /**
  * Api routes

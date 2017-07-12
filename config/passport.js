@@ -45,17 +45,26 @@ passport.deserializeUser((id, done) => {
 //     });
 //   });
 // }));
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
+
+
+passport.use(new LocalStrategy({
+  // by default, local strategy uses username and password, we will override with email
+  usernameField : 'email',
+  passwordField : 'password',
+  passReqToCallback : true // allows us to pass back the entire request to the callback
+}, (email, password, done) => {
+  User.findOne({ email: email }, (err, user) => {
+    console.log(email, password);
+    if (err) { return done(err); }
+    if (!user) {
+      return done(null, false, { msg: `Email ${email} not found.` });
+    }
+    /*user.comparePassword(password, (err, isMatch) => {
       if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+      if (isMatch) {
+        return done(null, user);
       }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
+      return done(null, false, { msg: 'Invalid email or password.' });
+    });*/
+  });
+}));

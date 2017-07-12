@@ -4,12 +4,11 @@ const passport = require('passport');
  * Login 
  */
 
- module.exports = (req, res) => {
+ module.exports = (req, res, next) => {
  	//req.checkBody('postparam', 'Message') //express validator, check req.body
  	//req.checkParams('urlparam', 'Message') //express validator, check req.params
  	//req.checkQuery('getparam', 'Message'') //express validator, check req.query
  	//req.assert('anyparam', 'Message'') //express validator, any param
- 	
  	req.assert('email', 'Email is not valid').isEmail();
  	req.assert('password', 'Password should not empty').notEmpty();
  	req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
@@ -25,20 +24,19 @@ const passport = require('passport');
 		    if (err) { return next(err); }
 
 		    if (!user) {
-		    	req.flash('errors', info);
-		      	console.log("login failed: ", info)
+		    	console.log("user not found");
+		    	//req.flash('errors', info);
 		      	//return res.redirect('/login');
 		    }
 		    
 		    req.logIn(user, (err) => {
-		      console.log("login success: ", user)
-		      if (err) { return next(err); }
+		      //if (err) { return next(err); }
 		      console.log("You are logged in")
 		      //req.flash('success', { msg: 'Success! You are logged in.' });
 		      //res.redirect(req.session.returnTo || '/');
 		    });
 
-		  })
+		  })(req, res, next);
 
  	} else {
 		res.render('account/login', {

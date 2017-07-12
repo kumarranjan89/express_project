@@ -5,7 +5,8 @@
 
  module.exports = (req, res) => {
  	//res.send('Hello world');
- 	res.render('home/index', {
- 		title: "Welcome"
+ 	req.logout();
+ 	res.render('index', {
+ 		title: "Home Page"
  	});
  }
